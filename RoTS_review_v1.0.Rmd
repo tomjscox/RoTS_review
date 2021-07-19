@@ -46,7 +46,7 @@ Based on increasingly abundant evidence of adverse health impacts of PFOS and ot
 
 
 # Attribution
-As for most toxic contaminants, humans are exposed to PFAS via different pathways (food, water, dust, skin,...). De Silva et al. (2021) provide a critical review of the current knowledge on exposure pathways. In many cases, the exposure to or in take of chemical contaminants from drinking-water is much lower than that from other sources (WHO, 2011). Consequently, when deriving health norms for contaminants in certain products or media, one has to take the other exposure pathways into account. This is called attribution. The WHO has clear guidelines for how to determine attribution factors for contaminants in drinking water. 
+As for most toxic contaminants, humans are exposed to PFAS via different pathways (food, water, dust, skin,...). De Silva et al. (2021) provide a critical review of the current knowledge on exposure pathways. In many cases, the exposure to or intake of chemical contaminants from drinking water is much lower than that from other sources (WHO, 2011). Consequently, when deriving health norms for contaminants in certain products or media, one has to take the other exposure pathways into account. This is called attribution. The WHO has clear guidelines for how to determine attribution factors for contaminants in drinking water. 
 
 ## Abscence of exposure data
 
