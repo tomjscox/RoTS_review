@@ -3,9 +3,9 @@ title: "Review RoTS analyses"
 output: html_notebook
 ---
 
-# Intro
+# Introduction
 
-This notebook goes into several issues with the RoTS, 2018 memo on deriving a norm for PFOS contamination in soil at the site of the Oosterweel works.
+This notebook goes into several issues with the RoTS, 2018 memo on deriving a norm for PFOS contamination in soil at the construction site of Oosterweel.
 
 The overall logic to determine a soil PFOS norm is
 
@@ -100,8 +100,24 @@ But this has important ramifications for deriving a drinking water quality stand
 
 # Partitioning and leaching from contaminated soil
 
-```{r}
-dat <- read.csv("./RoTS_uitspoeling.csv") 
+## Literature study
+
+To guarantee the use of groundwater for drinking purposes, the maximal PFOS concentration in groundwater is set equal to the maximal concentration in  drinking water. Subsequently, soils that can be re-used without treatment or special containment measures, we require that concentration in leaching water is also equal or below the drinking water standard. To determine the corresponding total contamination in the (in ng per kg dry weight) we need to know how much of the contaminant sticks to the soil (adsorption) and how much is freely available in the pore water. The so-called partitioning factors (Kd), which are nothing more than the ratio's between soil concentration (C_s) and pore water (C_w) concentration of a contaminant under equilibrium (K_d = c_s/c_w). With those factor we can compute the relative fraction of adsorbed contaminant and contaminant in solution; they are determined experimentally either in the lab or in the field.
+
+For many contaminants, partitioning is dependent on the soil properties (organic carbon (OC) content, pH, clay content, etc). This is also the case for PFOS. Li et al (2018) provide a critical review of the literature on partitioning of PFOS and other PFASs. In their Figure 1 they plot observed Kd values against soil organic matter content. Although there is an overall increasing trend of Kd with increasing organic matter content (they report a relatively high $R^2$ of 0.75 for the regression of PFOS vs. OC content) it can also be seen that there is a lot of variability in the reported values.
+
+
+![](./images/Fig1_Li_et_al_2018.png)
+Source: Li et al, 2018
+
+## Field study
+
+To get insight in PFOS leaching at the Oosterweel construction site, a limited field study was performed in which leaching was determined via 2 methods: column leaching and shaking experiments. Unsurprisingly, the field study also revealed a large variability. As is shown on the plot, there is no single curve or line that relates leaching concentration with soil concentration. On the contrary, different lines can be drawn through different subgroups of data. They all correspond to partitioning factors that are in line with Kd values for PFOS found in international literature, and the variability might reasonably be explained by differences in soil properties at the different sample sites (OC, pH, clay content). 
+
+Since there is no data on soil properties covering the total zone of contamination, a safe bet would be to use the leaching data from soils with lowest Kd and use that value to continue our analyses. Note that the data-set is extremely limited, and a safer bet would be to include a safety factor to take into account soils with even lower Kd values that have been missed in this limited field study.  
+
+```{r, include=FALSE, fig.show=FALSE}
+dat <- read.csv("./data/RoTS_uitspoeling.csv") 
 names(dat) <- c("type", "nr", "C_w", "C_s")
 
 par(mfrow=c(1,2))
@@ -116,7 +132,7 @@ points(dat$C_s[dat$type=="SP"], dat$C_w[dat$type=="SP"], pch=20, col="red")
 
 ```
 
-```{r}
+```{r, eval=FALSE, include=FALSE}
 dat1 <-  dat[dat$C_s<200,]
 dat2 <- dat[dat$C_w< 15,]
 
@@ -125,13 +141,11 @@ summary(lm(C_w~C_s+0, data=dat2))
 
 ```
 
-![](./images/Fig1_Li_et_al_2018.png)
-
 
 ```{r  literature values}
-# Li et al 2018 - Fig 1; assuming ~1%OM, Kd ~ 10 L/kg
-Kd_1 <- 12 # c_b/c_w
-Kd_2 <- 3.5
+# Different K_d values which are all in line with organic matter content betwee 0 and 2%
+Kd_1 <- 3.5 # c_b/c_w
+Kd_2 <- 12
 Kd_3 <- 50
 
 plot(dat$C_s[dat$type=="KP"], dat$C_w[dat$type=="KP"], pch=20, xlab=expression(paste("Bodem [", mu, "g/kg ds]")), ylab=expression(paste("Uitloging [",mu,"g/L]")))
@@ -145,6 +159,49 @@ legend("top", legend=paste("Kd = ", c(Kd_1, Kd_2, Kd_3), "L/kg"), lty=c(1,2,3), 
 
 
 ```
+# State of the art norms for PFOS in soil
+
+Combining our evidence based attribution factor for drinking water, and using the safe bet for the partitioning factor Kd = 3.5, we finally arrive at the state of the art norm or PFOS in soil from the Oosterweel construction site.
+
+
+|source|year|TDI (PFOS)|unit        | drinking water, adult (60kg) | drinking water, child (10kg)|unit| Soil concentration (A) | Soil concentration (C)|unit|
+|------|----|----------|------------|------------------------------|-----------------------------|----|------------------------|-----------------------|----|
+|EFSA  |2008|150       |ng/kg lg/dag| 45                           | 15                          |ng/L| 158                    | 52.5                  | ng/kg ds |
+|EPA   |2009|80        |ng/kg lg/dag| 24                           | 8                           |ng/L| 84                     | 28                    | ng/kg ds |
+|EPA   |2016|20        |ng/kg lg/dag| 6                            | 2                           |ng/L| 21                     | 7                     |ng/kg ds |
+|EFSA  |2018|20        |ng/kg lg/dag| 6                            | 2                           |ng/L| 21                     | 7                     |ng/kg ds |
+|EFSA  |2020|0.63      |ng/kg lg/dag| 0.189                        | 0.063                       |ng/L| 0.6                    | 0.2                   |ng/kg ds |
+
+# State of the art norms for PFOS in soil *at the time of writing* of the RoTS-memo
+
+The RoTS memo was finalized in February 2018. Although there were already European bases exposure pathway studies published in 2011 (e.g. Haug et al., 2011), we can compute what the results would have been when the **best practice WHO attribution factors (0.2)** would have been used 
+
+
+|source|year|TDI (PFOS)|unit        | drinking water, adult (60kg) | drinking water, child (10kg)|unit| Soil concentration (A) | Soil concentration (C)|unit|
+|------|----|----------|------------|------------------------------|-----------------------------|----|------------------------|-----------------------|----|
+|EFSA  |2008|150       |ng/kg lg/dag| 900                          | 300                         |ng/L| 3150                   | 1050                  | ng/kg ds |
+|EPA   |2009|80        |ng/kg lg/dag| 480                          | 160                         |ng/L| 1680                   | 560                   | ng/kg ds |
+|EPA   |2016|20        |ng/kg lg/dag| 120                          | 40                          |ng/L| 420                    | 140                   |ng/kg ds |
+|EFSA  |2018|20        |ng/kg lg/dag| 120                          | 40                          |ng/L| 420                    | 140                   |ng/kg ds |
+|EFSA  |2020|0.63      |ng/kg lg/dag| 3.78                         | 1.26                        |ng/L| 13.23                  | 4.41                  |ng/kg ds |
+ 
+
+
+
+# Comparison with RoTS/Lantis value
+
+The difference between the RoTS Lantis value is huge - their derived norm for soil is ... 70.000 ng/kg ds. This is  100.000 to 350.000 times the norm based on best pratice and latest evidence and insight, and 165-500 times larger than what would have been best practice at time of writing of the RoTS memo. This is the combined result of cherry picking their "analysis": everywhere possible choices have been made with the most harm to people and planet and the least "obligations" for polluters. 
+
+More precisely:
+
+* An outdated value (EFSA, 2008) was used for total daily intake of PFOS. Although the more stringent norms in neighbouring countries and in the US are acknowledged, and the upcoming new EFSA norm (2018) is acknowledged in the memo, nowhere it is motivated why the outdated norm has been chosen. This has resulted in a factor 7 overestimation (at the time of writing) of the TDI. Further, compared to the latest state of the art knowledge EFSA, 2020 norm, a factor 240 overestimation of the TDI was chosen.
+
+* Without any motivation, the standard practice of attribution to drinking water (WHO, 2011) was abandoned and 100% of the TDI was allowed through drinking water. At the time of writing of the RoTS memo, this resulted in an additionol 5-fold overestimation of allowable concentrations in drinking water. Taking the current state of the art (where we know that intake via drinking water is ~1% of total intake), the choise for 100% TDI via drinking water results in an additional overestimation of a factor 100.
+
+* From the already limited data set of the field sampling study, the data with largest leaching rates were left out of the analys. This is cherry-picking that does not withstand any good (scientific) practice. The resulting partitioning between pore water and soil underestimates the leaching by an additional factor of about 14. 
+
+These 3 cases of cherry picking explain the enormous difference between the RoTS-memo soils concentration of 70.000 ng/kg dw and the evidence based, best practice soil concentration of 0.2-0.6 ng/kg dw.
+
 
 
 # References
@@ -158,5 +215,10 @@ EFSA, 2020. Scientific Opinion on the risk to human health related to the presen
 EFSA, 2020. Data appendix. https://zenodo.org/record/3974423
 
 Fenton, SE et al. 2021. Per‐and Polyfluoroalkyl Substance Toxicity and Human Health Review: Current State of Knowledge and Strategies for Informing Future Research. Environmental Toxicology and Chemistry—Volume 40, Number 3—pp. 606–630. DOI: 10.1002/etc.4890
+
+Haug, LS et al., 2011. Characterisation of human exposure pathways to perfluorinated compounds — Comparing ex-posure estimates with biomarkers of exposure. Environment International 37:687–693.  DOI: 10.1016/j.envint.2011.01.011 
+
+Li, Y, 2018. A critical analysis of published data to discern the role of soil and sediment properties in determining sorption of per and polyfluoroalkyl
+substances (PFASs). Science of the Total Environment 628–629, p110–120. https://doi.org/10.1016/j.scitotenv.2018.01.167
 
 WHO, 2011. Guidelines for Drinking-water Quality. Fourth edition. ISBN 978 92 4 154815 1 https://www.who.int/publications/i/item/9789241549950
