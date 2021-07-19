@@ -1,6 +1,8 @@
 ---
 title: "Review RoTS analyses"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 # Introduction
